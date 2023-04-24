@@ -1,0 +1,88 @@
+# About Data
+# This dataset contains detailed information on a collection of laptops, including specifications, features. The data was collected through web scraping The dataset is in CSV format and includes nearer 990 laptops with 13 columns of data, such as laptop Company, Model, Rating, Review, Processor, RAM, Storage, Display size, Price, MRP, Images.
+
+# Task
+# Finding what factors affect customers laptop buyind decisions
+
+# Exploring Data
+# In this step we will explore data to find any null or duplicated values.
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+data = pd.read_csv('/kaggle/input/laptop-league-a-comprehensive-dataset-for-laptops/Laptop_Information.csv')
+data.head()
+
+# Dropping 'Unnamed: 0' and 'ImgURL' columns.
+df = data.drop(['Unnamed: 0', 'ImgURL'], axis=1)
+data.describe()
+
+data.info()
+
+# Visualizing Data
+# In this step we will plot graphs to find relation between different columns.
+
+plt.figure(figsize=(12,6))
+sns.distplot(df['Price'])
+plt.show()
+
+plt.figure(figsize=(12, 6))
+df['Company'].value_counts().plot(kind='bar')
+plt.title('Company Popularity')
+plt.show()
+
+
+# A function to figure out the brand of Processors and adding it in a new column.
+def processor_brand(processor):
+    if processor == 'AMD Ryzen 5' or processor == 'Intel Core i5' or processor == 'Intel Core i3':
+        return processor
+    else:
+        if processor.split()[0] == 'Intel':
+            return 'Other Intel Processor'
+        else:
+            return 'AMD Processor'
+data['Processor']=data['Processor'].apply(lambda x:' '.join(x.split()[0:3]))
+data['Processor Brand'] = data['Processor'].apply(processor_brand)
+data.head(10)
+
+data['Processor Brand'].value_counts().plot(kind='bar')
+plt.title('Processor Brand Popularity')
+plt.show()
+
+
+plt.figure(figsize=(12,6))
+df['RAM'].value_counts().plot(kind='bar')
+plt.title('RAM Space Popularity')
+plt.xticks(rotation=0)
+plt.show()
+
+# Finding what RAM in laptops customers buy most often.
+
+plt.bar(data['Processor Brand'], data['Rating'])
+plt.xticks(rotation=45)
+plt.show()
+
+plt.bar(data['Processor Brand'], data['Price'])
+plt.xticks(rotation=45)
+plt.show()
+
+plt.bar(data['Company'], data['Price'])
+plt.xticks(rotation=45)
+plt.show()
+
+# Function for simplifying Price column by adding them in a certain price range.
+def price_range(price):
+    if 15000 < price < 35000:
+        return '15000-35000'
+    elif 35000 < price < 55000:
+        return '35000-55000'
+    elif 55000 < price < 75000:
+        return '55000-75000'
+    elif 75000 < price < 95000:
+        return '75000-95000'
+    
+data['Price Range'] = data['Price'].apply(price_range)
+data.head()
+
+plt.title('Price Range')
+plt.show()
